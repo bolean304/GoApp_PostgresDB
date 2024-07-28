@@ -22,20 +22,38 @@ type Product struct {
 	  log.Fatal(err)
     }
     CreateProductTable(db)
-    product := Product{"Table ",200,true}
-    pk := InsertProduct(db,product)
-    fmt.Println("ID : %d",pk)
+    // product := Product{"Table ",200,true}
+    // pk := InsertProduct(db,product)
+    // fmt.Println("ID : %d",pk)
+	// var name  string
+	// var price float64
+	// var available bool
+	// query := "SELECT name ,available, price FROM product WHERE id = $1"
+    // errr := db.QueryRow(query,pk).Scan(&name, &available, &price)
+	// if errr != nil{
+	// 	log.Fatal(errr)
+	// }
+	// fmt.Println("name : %v",name)
+	// fmt.Println("price : %v",price)
+	// fmt.Println("available : %v",available)
+	data := []Product{}
+	rows ,err := db.Query("SELECT name ,available,price FROM product")
+	if err != nil{
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	// to scan DB vals
 	var name  string
 	var price float64
 	var available bool
-	query := "SELECT name ,available, price FROM product WHERE id = $1"
-    errr := db.QueryRow(query,pk).Scan(&name, &available, &price)
-	if errr != nil{
-		log.Fatal(errr)
+	for rows.Next(){
+		err := rows.Scan(&name,&available,&price)
+		if err != nil{
+			log.Fatal(err)
+		}
+		data = append(data,Product{name,price,available})
 	}
-	fmt.Println("name : %v",name)
-	fmt.Println("price : %v",price)
-	fmt.Println("available : %v",available)
+	fmt.Println(data)
  }
 
 func CreateProductTable(db *sql.DB ){
